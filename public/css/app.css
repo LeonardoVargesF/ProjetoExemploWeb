@@ -1,0 +1,11 @@
+
+.cabecalho th{
+    font-weight:700;
+    text-align:center;
+    background: #00695C;
+    color:#fff;
+}
+
+.centralizado{
+    text-align: center;
+}

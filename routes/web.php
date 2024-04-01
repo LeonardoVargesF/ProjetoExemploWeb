@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AutorController;
+use App\Http\Controllers\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +15,8 @@ use App\Http\Controllers\AutorController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/dashboard', [Dashboard::class,'dashboard'])->name('dashboard');
 
-});
 
 Route::prefix('autor')->group(function(){
 

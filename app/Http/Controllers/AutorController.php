@@ -21,12 +21,16 @@ class AutorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()#mostrar os dados do nosso autor
+    public function index(Request $request)#mostrar os dados do nosso autor
     {
-       // dd('acessando o controller autor controler - index');// mostrar uma mensagem 
+        $pesquisar = $request->pesquisar;
+        $page = $request->perPage;
+       #dd($request->all());// mostrar uma mensagem 
        //$registros = Autor::paginate(10);#crie uma variável
-       $registros = $this->service->index();
-        return view ('autor.index', ['registros' => $registros['registros'],]); //retorna os conteudo para determinado local
+       $registros = $this->service->index($pesquisar, $page);
+        return view ('autor.index', ['registros' => $registros['registros'],
+                                     'pages'=>[5,10,15,20],
+                                     'item'=>5,]); //retorna os conteudo para determinado local
     }
 
     /**
