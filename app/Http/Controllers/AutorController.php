@@ -6,6 +6,7 @@ use App\Http\Requests\AutorFormRequest;
 use Illuminate\Http\Request;
 use App\Models\Autor;
 use App\Service\AutorServiceInterface;
+use Exception;
 
 class AutorController extends Controller
 {
@@ -23,14 +24,14 @@ class AutorController extends Controller
      */
     public function index(Request $request)#mostrar os dados do nosso autor
     {
-        $pesquisar = $request->pesquisar;
-        $page = $request->perPage;
+        $pesquisar = $request->pesquisar ?? "";
+        $perPage = $request->perPage ?? 5;
        #dd($request->all());// mostrar uma mensagem 
        //$registros = Autor::paginate(10);#crie uma variável
-       $registros = $this->service->index($pesquisar, $page);
-        return view ('autor.index', ['registros' => $registros['registros'],
-                                     'pages'=>[5,10,15,20],
-                                     'item'=>5,]); //retorna os conteudo para determinado local
+       $registros = $this->service->index($pesquisar, $perPage);
+        return view ('autor.index', ['registros' => $registros,
+                                     'perPage'=>$perPage,
+                                     'filter'=>$pesquisar,]); //retorna os conteudo para determinado local
     }
 
     /**
@@ -47,10 +48,18 @@ class AutorController extends Controller
      */
     public function store(AutorFormRequest $request)
     {
-        
+        $registro = null;
 
-        $this->service->store($request);
-        return redirect()->route('autor.index');
+        $registro = $request->all();
+        try{
+        $registro = $this->service->store($registro);
+        return redirect()->route('autor.index')->with('success', 'Registro cadastrado com sucesso');
+        } catch(Exception $e){
+            return view('autor.create',[
+                'registro'=>$registro,
+                'fail'=>$e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -58,7 +67,18 @@ class AutorController extends Controller
      */
     public function show(string $id)
     {
+        $registro = null;
+
+        try{
         $registro = $this->service->show($id);
+        return view('autor.show',[
+            'registro'=>$registro]);
+        } catch(Exception $e){
+            return view('autor.show',[
+                'registro'=>$registro,
+                'fail'=>$e->getMessage(),
+            ]);
+        }
         return view('autor.show', ['registro'=> $registro['registro'],]);
     }
 
@@ -67,8 +87,18 @@ class AutorController extends Controller
      */
     public function edit(string $id)
     {
-        $registro = $this->service->show($id);
-        return view ('autor.edit',['registro'=>$registro['registro']]);
+        $registro = null;
+
+        try{
+            $registro = $this->service->show($id);
+            return view('autor.edit',[
+                'registro'=>$registro,]);
+            } catch(Exception $e){
+                return view('autor.edit',[
+                    'registro'=>$registro,
+                    'fail'=>$e->getMessage(),
+                ]);
+            }
     }
 
     /**
@@ -76,29 +106,32 @@ class AutorController extends Controller
      */
     public function update(AutorFormRequest $request, string $id)
     {
-        
-        $this->service->update($request, $id);
+        $registro = null;
 
-       /* $autor['nome'] = $registro['nome'];
-        $autor['apelido'] = $registro['apelido'];
-        $autor['cidade'] = $registro['cidade'];
-        $autor['bairro'] = $registro['bairro'];
-        $autor['cep'] = $registro['cep'];
-        $autor['email'] = $registro['email'];
-        $autor['telefone'] = $registro['telefone'];
-        
-        $autor->save();*/
-
-        return redirect()->route('autor.index');
-
-        //dd($registro);
+        $registro = $request->all();
+        try{
+        $registro = $this->service->update($registro, $id);
+        return redirect()->route('autor.index')->with('success', 'Registro alterado com sucesso!');
+        } catch(Exception $e){
+            return view('autor.edit',[
+                'registro'=>$registro,
+                'fail'=>$e->getMessage(),
+            ]);
+        }
     }
 
     public function delete(string $id){
 
-        $registro = $this->service->show($id);
-        return view('autor.destroy', ['registro'=>$registro['registro']]);
-
+        try{
+            $registro = $this->service->show($id);
+            return view('autor.destroy',[
+                'registro'=>$registro,]);
+            } catch(Exception $e){
+                return view('autor.destroy',[
+                    'registro'=>$registro,
+                    'fail'=>$e->getMessage(),
+                ]);
+            }
     }
 
     /**
@@ -106,8 +139,14 @@ class AutorController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->service->destroy($id);
-        return redirect()->route('autor.index');
-        //dd($id);
+
+        try{
+            $this->service->destroy($id);
+            return redirect()->route('autor.index')->with('success', 'Registro excluido com sucesso!');
+            } catch(Exception $e){
+                return view('autor.destroy',[
+                    'fail'=>$e->getMessage(),
+                ]);
+            }
     }
 }

@@ -4,7 +4,7 @@ namespace App\Service;
 
 interface ServiceInterface{
 
-    public function index();
+    public function index($pesquisar, $perPage);
     
 
     public function store($request);

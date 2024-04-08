@@ -22,7 +22,7 @@ Route::prefix('autor')->group(function(){
 
 
 
-Route::get('/index' , [AutorController::class,'index'])->name('autor.index'); //para ler uso get
+Route::any('/index' , [AutorController::class,'index'])->name('autor.index'); //para ler uso get
 Route::get('/create', [AutorController::class, 'create'])->name('autor.create');
 Route::get('/edit/{id}', [AutorController::class, 'edit'])->name('autor.edit');
 Route::get('/show/{id}', [AutorController::class, 'show'])->name('autor.show');
